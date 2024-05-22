@@ -1,8 +1,9 @@
-import axios from 'axios';
+// import axios from 'axios';
 
 const moreButton = document.querySelector('.more-info__button');
 const weatherInfo = document.querySelector('.more-info');
 const weatherInfoList = document.querySelector('.more-info__list');
+let btnMargin = document.querySelector('.today__button__list');
 
 let dateForMore = 26;
 
@@ -26,7 +27,7 @@ export default async function fetchMoreInfo(data, idBtn) {
             <span class="time-weather__span">${Math.round(
               elem.main.temp
             )} °</span>
-        </p>    
+        </p>
     <ul class="time-weather__data">
         <li class="time-weather__pressure">
         <div class="time-weather__icon-pressure"></div>
@@ -45,14 +46,14 @@ export default async function fetchMoreInfo(data, idBtn) {
   return item;
 }
 
-function fetchInfoWeather(event) {
-  event.preventDefault();
-  if (weatherInfo.classList.contains('is-hidden')) {
-    weatherInfo.classList.remove('is-hidden');
-  } else {
-    weatherInfo.classList.add('is-hidden');
-  }
-}
+// function fetchInfoWeather(event) {
+//   event.preventDefault();
+//   if (weatherInfo.classList.contains('is-hidden')) {
+//     weatherInfo.classList.remove('is-hidden');
+//   } else {
+//     weatherInfo.classList.add('is-hidden');
+//   }
+// }
 
 function addZero(i) {
   if (i < 10) {
@@ -69,6 +70,8 @@ const getCurrentTime = data => {
   return time;
 };
 
-function closeMoreInfo() {
-  weatherInfo.classList.add('is-hidden');
-}
+// function closeMoreInfo() {
+//   weatherInfo.classList.add('is-hidden');
+//   // additional code
+//   btnMargin.style.marginTop = '68px';
+// }
