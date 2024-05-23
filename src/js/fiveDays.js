@@ -187,6 +187,10 @@ function adjustMarginTop(visible = false) {
     btnMargin.style.marginTop = '68px'; // Set margin when more info is visible
   } else {
     btnMargin.style.marginTop = ''; // Reset margin when more info is hidden
+    const allButtons = document.querySelectorAll('.fiveDays__btn');
+    allButtons.forEach(button => {
+      button.style.opacity = 0.3;
+    });
   }
 }
 
@@ -195,4 +199,26 @@ function clearColorWeekDay() {
   if (isChosenWeekDay) {
     isChosenWeekDay.classList.remove('fiveDays--selected');
   }
+}
+
+// Add event listener to weatherInfo element for transition end
+weatherInfo.addEventListener('transitionend', handleTransitionEnd);
+
+// Function to handle transition end event
+function handleTransitionEnd(event) {
+  // Check if opacity transition ended on the weatherInfo element
+  if (event.propertyName === 'opacity') {
+    // If weatherInfo is hidden, change opacity of more info buttons to 0.3
+    if (weatherInfo.classList.contains('is-hidden')) {
+      changeMoreInfoButtonsOpacity(0.3);
+    }
+  }
+}
+
+// Function to change opacity of more info buttons
+function changeMoreInfoButtonsOpacity(opacity) {
+  const moreInfoButtons = document.querySelectorAll('.fiveDays__btn');
+  moreInfoButtons.forEach(button => {
+    button.style.opacity = opacity;
+  });
 }
