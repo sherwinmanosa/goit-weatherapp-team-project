@@ -12,7 +12,6 @@ let listForMore = {};
 
 export default async function test(testList) {
   let infoAboutCity = testList.city;
-
   latForFiveDays = infoAboutCity.coord.lat;
   lonForFiveDays = infoAboutCity.coord.lon;
   nameForFiveDays = infoAboutCity.name;
@@ -36,7 +35,9 @@ async function fetchWeatherForFiveDays() {
     const weatherList = await response.json();
     return weatherList.daily;
   } catch (error) {
-    // Notify.failure("Sorry, there are no cyties matching your search query. Please try again.")
+    Notify.failure(
+      'Sorry, there are no cities matching your search query. Please try again.'
+    );
   }
 }
 
@@ -126,24 +127,10 @@ function createDateForFiveDays(weather) {
   return [weekDay, day, month];
 }
 
-// change of city and country that return from the very first call to back
 function changeNameForFiveDays() {
   fiveDayCitiesName.innerHTML = '';
   fiveDayCitiesName.textContent = `${nameForFiveDays}, ${countryForFiveDays}`;
 }
-
-// container display 5 days
-export function showFiveDays() {
-  fiveDayContainer.classList.remove('is-hidden');
-  clearColorWeekDay();
-}
-
-// hide container for 5 days - add to button today
-function hideFiveDays() {
-  fiveDayContainer.classList.add('is-hidden');
-}
-
-// change the color of the day by clicking on moreinfo
 
 fiveDayList.addEventListener('click', changeColorWeekDay);
 let isChosenWeekDay = null;
@@ -151,19 +138,55 @@ function changeColorWeekDay(evt) {
   if (evt.target.nodeName !== 'BUTTON') {
     return;
   }
-  clearColorWeekDay();
-  fetchMoreInfo(listForMore, evt.target.id);
-  weatherInfo.classList.remove('is-hidden');
 
   const chosenWeekDay = evt.target.parentNode.firstElementChild;
-  chosenWeekDay.classList.add('fiveDays--selected');
+  const isAlreadySelected =
+    chosenWeekDay.classList.contains('fiveDays--selected');
 
-  if (!evt.target || !isChosenWeekDay) {
+  clearColorWeekDay();
+
+  // If the clicked button corresponds to the already selected day,
+  // toggle the visibility of the more info section.
+  if (isAlreadySelected) {
+    weatherInfo.classList.toggle('is-hidden');
+    adjustMarginTop();
     return;
   }
-  if (evt.target.parentNode === isChosenWeekDay.parentNode) {
-    chosenWeekDay.classList.remove('fiveDays--selected');
-    weatherInfo.classList.add('is-hidden');
+
+  // Otherwise, proceed with selecting the clicked day and showing more info.
+  clearColorWeekDay();
+  chosenWeekDay.classList.add('fiveDays--selected');
+
+  // Update opacity of "more info" buttons
+  updateMoreInfoButtonsOpacity(evt.target);
+
+  fetchMoreInfo(listForMore, evt.target.id);
+  weatherInfo.classList.remove('is-hidden');
+  adjustMarginTop(true);
+
+  // const moreInfoVisible = !weatherInfo.classList.contains('is-hidden');
+  // const btnMargin = document.querySelector('.today__button__list');
+  // btnMargin.style.marginTop = moreInfoVisible ? '68px' : ''; // Adjust margin based on visibility
+}
+
+function updateMoreInfoButtonsOpacity(selectedButton) {
+  const allButtons = document.querySelectorAll('.fiveDays__btn');
+  const isHidden = weatherInfo.classList.contains('is-hidden');
+  allButtons.forEach(button => {
+    if (button === selectedButton) {
+      button.style.opacity = 1; // Set opacity to 1 for selected button
+    } else {
+      button.style.opacity = 0.3; // Set opacity to 0.3 for other buttons
+    }
+  });
+}
+
+function adjustMarginTop(visible = false) {
+  const btnMargin = document.querySelector('.today__button__list');
+  if (visible) {
+    btnMargin.style.marginTop = '68px'; // Set margin when more info is visible
+  } else {
+    btnMargin.style.marginTop = ''; // Reset margin when more info is hidden
   }
 }
 

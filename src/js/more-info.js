@@ -1,9 +1,8 @@
 // import axios from 'axios';
 
-const moreButton = document.querySelector('.more-info__button');
+// const moreButton = document.querySelector('.more-info__button');
 const weatherInfo = document.querySelector('.more-info');
 const weatherInfoList = document.querySelector('.more-info__list');
-let btnMargin = document.querySelector('.today__button__list');
 
 let dateForMore = 26;
 
