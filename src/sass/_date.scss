@@ -110,6 +110,12 @@
   }
 }
 
+@media screen and (max-width: 780px) {
+  .date-container {
+    margin-top: 0;
+  }
+}
+
 @media screen and (min-width: 768px) {
   .date-container {
     width: 500px;
