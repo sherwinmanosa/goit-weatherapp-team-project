@@ -1,5 +1,5 @@
-import openFiveDays from './fiveDays';
-import showFiveDays from './fiveDays';
+import openFiveDays from './five_Days';
+import showFiveDays from './five_Days';
 const fiveDayContainer = document.querySelector('.fiveDays--container');
 const todaySection = document.querySelector('.today__section');
 const chartShow = document.querySelector('.chart--show');

@@ -62,7 +62,7 @@
   display: flex;
   flex-wrap: nowrap;
 
-  padding: 0;
+  padding: 0 0 15px 0;
   font-size: 12px;
   line-height: 1.2;
   letter-spacing: 0.04em;
@@ -189,7 +189,7 @@
   font-weight: bold;
   font-style: normal;
   line-height: 1.2;
-
+  cursor: pointer;
   min-height: 20px;
   min-width: 57px;
   padding: 0px;

@@ -1,12 +1,11 @@
 import axios from 'axios';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-
-import fetchImages from './randomImg';
-import fetchRandomQuote from './randomQuote';
-import renderOneDayWeather from './timenow';
+import fetchImages from './random_Img.js';
+import fetchRandomQuote from './random_Quote.js';
+import renderOneDayWeather from './date_time.js';
 import fetchMoreInfo from './more-info.js';
-import renderCurrentWeather from './today';
-import test from './fiveDays';
+import renderCurrentWeather from './today.js';
+import test from './five_Days.js';
 
 function seachCityApi(e) {
   // console.dir(e.target);
@@ -29,8 +28,7 @@ navigator.geolocation.getCurrentPosition(success, onError);
 
 function onSearch(event) {
   event.preventDefault();
-  const query = inputRef.value;
-  fetchWeather(query);
+  fetchWeather(inputRef.value);
 }
 
 function success(position) {
