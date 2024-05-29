@@ -1,8 +1,7 @@
 import fetchMoreInfo from './more-info';
 import runChart from './chart';
-const fiveDayList = document.querySelector('.fiveDays__list');
-const fiveDayCitiesName = document.querySelector('.fiveDays__citiesName');
-const fiveDayContainer = document.querySelector('.fiveDays--container');
+const fiveDaysList = document.querySelector('.fiveDays__list');
+const fiveDaysCitiesName = document.querySelector('.fiveDays__citiesName');
 const weatherInfo = document.querySelector('.more-info');
 let latForFiveDays = '';
 let lonForFiveDays = '';
@@ -17,7 +16,6 @@ export default async function test(testList) {
   nameForFiveDays = infoAboutCity.name;
   countryForFiveDays = infoAboutCity.country;
   openFiveDays();
-
   listForMore = testList;
 }
 
@@ -50,7 +48,7 @@ async function creatingFiveDays() {
 }
 
 async function createMarkupFiveDays(weathers) {
-  fiveDayList.innerHTML = '';
+  fiveDaysList.innerHTML = '';
   let MarkupFiveDays = await weathers
     .slice(1, 6)
     .map(weather => {
@@ -87,7 +85,7 @@ async function createMarkupFiveDays(weathers) {
     })
     .join('');
 
-  return await fiveDayList.insertAdjacentHTML('beforeend', MarkupFiveDays);
+  return await fiveDaysList.insertAdjacentHTML('beforeend', MarkupFiveDays);
 }
 
 // working with dates
@@ -128,11 +126,11 @@ function createDateForFiveDays(weather) {
 }
 
 function changeNameForFiveDays() {
-  fiveDayCitiesName.innerHTML = '';
-  fiveDayCitiesName.textContent = `${nameForFiveDays}, ${countryForFiveDays}`;
+  fiveDaysCitiesName.innerHTML = '';
+  fiveDaysCitiesName.textContent = `${nameForFiveDays}, ${countryForFiveDays}`;
 }
 
-fiveDayList.addEventListener('click', changeColorWeekDay);
+fiveDaysList.addEventListener('click', changeColorWeekDay);
 let isChosenWeekDay = null;
 function changeColorWeekDay(evt) {
   if (evt.target.nodeName !== 'BUTTON') {

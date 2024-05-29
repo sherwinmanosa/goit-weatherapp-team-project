@@ -16,19 +16,18 @@ function seachCityApi(e) {
   }
 }
 
-const formRef = document.querySelector('.search-city');
-const inputRef = document.querySelector('.search-form');
-// const button = document.querySelector('.search-city__form-btn');***
+const formRefSearch = document.querySelector('.search-city');
+const inputRefSearch = document.querySelector('.search-form');
 const geoBtn = document.querySelector('.geo-btn');
 
-formRef.addEventListener('submit', onSearch);
+formRefSearch.addEventListener('submit', onSearch);
 geoBtn.addEventListener('click', getLocationByIP);
 // button.addEventListener('click', onClickAddFavor)
 navigator.geolocation.getCurrentPosition(success, onError);
 
 function onSearch(event) {
   event.preventDefault();
-  fetchWeather(inputRef.value);
+  fetchWeather(inputRefSearch.value);
 }
 
 function success(position) {
@@ -44,29 +43,12 @@ function onError() {
 
 async function getLocationByIP() {
   const response = await axios.get(`https://ipapi.co/json/`);
-  const locationByIP = await response.data;
-  const query = locationByIP.city;
-  inputRef.value = query;
+  const { city } = await response.data;
+  inputRefSearch.value = city;
 
-  fetchWeather(query);
+  fetchWeather(city);
 }
 
-//fetching weather data from the OpenWeatherMap API based on  latitude and longitude coordinates.*
-async function fetchWeatherByCoords(lat, lon) {
-  // const output = document.querySelector('.output');***
-  const response = await axios.get(
-    `https://api.openweathermap.org/data/2./forecast?lat=${lat}&lon=${lon}&units=metric&lang=en&appid=c32df37628577b1447329bd64ef99bea`
-  );
-
-  const weather = await response.data;
-  renderCurrentWeather(weather);
-
-  renderOneDayWeather(weather);
-  fetchMoreInfo(weather);
-  fetchImages(weather);
-  fetchRandomQuote();
-  test(weather);
-}
 //fetching weather data from the OpenWeatherMap API*
 async function fetchWeather(query) {
   let response;
@@ -88,36 +70,48 @@ async function fetchWeather(query) {
   }
 }
 
+//fetching weather data from the OpenWeatherMap API based on  latitude and longitude coordinates.*
+async function fetchWeatherByCoords(lat, lon) {
+  // const output = document.querySelector('.output');***
+  const response = await axios.get(
+    `https://api.openweathermap.org/data/2./forecast?lat=${lat}&lon=${lon}&units=metric&lang=en&appid=c32df37628577b1447329bd64ef99bea`
+  );
+
+  const weather = await response.data;
+  renderCurrentWeather(weather);
+
+  renderOneDayWeather(weather);
+  fetchMoreInfo(weather);
+  fetchImages(weather);
+  fetchRandomQuote();
+  test(weather);
+}
+
 const seachInput = document.querySelector('.search-form');
-const seachFavList = document.querySelector('.seach-favorite-list');
-const favorBtn = document.querySelector('.search-city__form-btn');
-favorBtn.addEventListener('click', addToFav);
+const seachFavoriteList = document.querySelector('.seach-favorite-list');
+const favoriteBtn = document.querySelector('.search-city__form-btn');
+favoriteBtn.addEventListener('click', addToFav);
 const seachBackBtn = document.querySelector('.back-btn');
 seachBackBtn.addEventListener('click', prevSeachElem);
 const seachFrwBtn = document.querySelector('.frw-btn');
 seachFrwBtn.addEventListener('click', nextSeachElem);
 
 //Add city in favorite list
-let favoritItems = [];
-function addToFav() {
-  if (localStorage.getItem('favor')) {
-    favoritItems = JSON.parse(localStorage.getItem('favor'));
-    if (
-      seachInput.value.length > 0 &&
-      !favoritItems.includes(seachInput.value)
-    ) {
-      favoritItems.push(seachInput.value);
-    } else if (favoritItems.includes(seachInput.value)) {
-      alert('The city is already in your favorites list');
-    }
 
-    localStorage.setItem('favor', JSON.stringify(favoritItems));
+let favoritItems = JSON.parse(localStorage.getItem('favor')) || [];
+
+function addToFav() {
+  const inputValue = seachInput.value.trim();
+
+  if (inputValue.length === 0) return;
+
+  if (favoritItems.includes(inputValue)) {
+    alert('The city is already in your favorites list');
   } else {
-    if (seachInput.value.length > 0) {
-      favoritItems.push(seachInput.value);
-    }
+    favoritItems.push(inputValue);
     localStorage.setItem('favor', JSON.stringify(favoritItems));
   }
+
   countFav();
 }
 
@@ -133,7 +127,7 @@ async function renderFavList(render) {
     )
     .join('');
 
-  seachFavList.innerHTML = await renderFavItem;
+  seachFavoriteList.innerHTML = await renderFavItem;
   if (JSON.parse(localStorage.getItem('favor')).length) {
     renderFwdBackBtn();
   }
@@ -141,47 +135,40 @@ async function renderFavList(render) {
 
 // Forward button for favorite list
 function renderFwdBackBtn() {
-  let favoritItems = JSON.parse(localStorage.getItem('favor'));
+  const favoritItems = JSON.parse(localStorage.getItem('favor'));
+  const lastItemId = seachFavoriteList.lastChild.id;
+  const firstItemId = seachFavoriteList.firstChild.id;
 
-  if (
-    favoritItems.indexOf(seachFavList.lastChild.id) ===
-      favoritItems.length - 1 &&
-    !seachFrwBtn.classList.contains('visually-hidden')
-  ) {
+  if (favoritItems.indexOf(lastItemId) === favoritItems.length - 1) {
     seachFrwBtn.classList.add('visually-hidden');
-  }
-
-  if (
-    favoritItems.indexOf(seachFavList.lastChild.id) !==
-    favoritItems.length - 1
-  ) {
+  } else {
     seachFrwBtn.classList.remove('visually-hidden');
   }
 
-  if (favoritItems.indexOf(seachFavList.firstChild.id) === 0) {
+  if (favoritItems.indexOf(firstItemId) === 0) {
     seachBackBtn.classList.add('visually-hidden');
-  } else if (seachBackBtn.classList.contains('visually-hidden')) {
+  } else {
     seachBackBtn.classList.remove('visually-hidden');
   }
 
-  if (!seachBackBtn.classList.contains('visually-hidden')) {
-    seachFavList.style.marginLeft = '10px';
-  } else {
-    seachFavList.style.marginLeft = '51px';
-  }
+  seachFavoriteList.style.marginLeft = !seachBackBtn.classList.contains(
+    'visually-hidden'
+  )
+    ? '10px'
+    : '51px';
 }
 
 // Managing favorite items or fetching weather information
 function action(e) {
-  console.log(e.target.nodeName);
-  let favoritItems = JSON.parse(localStorage.getItem('favor'));
-  if (e.target.nodeName === 'DIV') {
-    console.log(e.currentTarget.id);
-    let idxOfDelElem = favoritItems.indexOf(`${e.currentTarget.id}`);
+  const targetNodeName = e.target.nodeName;
+  const favoritItems = JSON.parse(localStorage.getItem('favor'));
+
+  if (targetNodeName === 'DIV') {
+    const currentId = e.currentTarget.id;
+    const idxOfDelElem = favoritItems.indexOf(currentId);
 
     favoritItems.splice(idxOfDelElem, 1);
     localStorage.setItem('favor', JSON.stringify(favoritItems));
-
     countFav();
   } else {
     fetchWeather(e.currentTarget.id);
@@ -190,49 +177,16 @@ function action(e) {
 
 //Updating the count of favorite items and rendering the list of favorites accordingly.
 async function countFav() {
-  if (localStorage.getItem('favor')) {
-    let favoritItems = JSON.parse(localStorage.getItem('favor'));
+  const favoritItems = JSON.parse(localStorage.getItem('favor')) || [];
 
-    if (window.outerWidth <= 767 && favoritItems.length > 2) {
-      favoritItems.splice(2);
-    } else if (window.outerWidth > 767 && favoritItems.length > 4) {
-      favoritItems.splice(4);
-    }
+  const maxItems = window.outerWidth <= 767 ? 2 : 4;
+  favoritItems.splice(maxItems);
 
-    await renderFavList(favoritItems);
-
-    const FavElem = document.querySelectorAll('.seach-favorite-item');
-
-    FavElem.forEach(x => x.addEventListener('click', action));
-  }
-}
-
-// Handle navigation to the next set of favorite items in the list.
-async function nextSeachElem() {
-  let favoritItems = JSON.parse(localStorage.getItem('favor'));
-
-  if (
-    favoritItems.indexOf(seachFavList.lastChild.id) !==
-    favoritItems.length - 1
-  ) {
-    if (window.outerWidth <= 767) {
-      favoritItems = favoritItems.splice(
-        favoritItems.indexOf(seachFavList.lastChild.id),
-        2
-      );
-    } else if (window.outerWidth > 767) {
-      favoritItems = favoritItems.splice(
-        favoritItems.indexOf(seachFavList.lastChild.id) - 2,
-        4
-      );
-    }
-  } else {
-    console.log('test1');
-  }
   await renderFavList(favoritItems);
-  const FavElem = document.querySelectorAll('.seach-favorite-item');
 
-  FavElem.forEach(x => x.addEventListener('click', action));
+  document
+    .querySelectorAll('.seach-favorite-item')
+    .forEach(x => x.addEventListener('click', action));
 }
 
 async function prevSeachElem() {
@@ -240,16 +194,44 @@ async function prevSeachElem() {
 
   if (window.outerWidth <= 767) {
     favoritItems = favoritItems.splice(
-      favoritItems.indexOf(seachFavList.firstChild.id) - 1,
+      favoritItems.indexOf(seachFavoriteList.firstChild.id) - 1,
       2
     );
   } else if (window.outerWidth > 767) {
     favoritItems = favoritItems.splice(
-      favoritItems.indexOf(seachFavList.firstChild.id) - 1,
+      favoritItems.indexOf(seachFavoriteList.firstChild.id) - 1,
       4
     );
   }
 
+  await renderFavList(favoritItems);
+  const FavElem = document.querySelectorAll('.seach-favorite-item');
+
+  FavElem.forEach(x => x.addEventListener('click', action));
+}
+
+// Handle navigation to the next set of favorite items in the list.
+async function nextSeachElem() {
+  let favoritItems = JSON.parse(localStorage.getItem('favor'));
+
+  if (
+    favoritItems.indexOf(seachFavoriteList.lastChild.id) !==
+    favoritItems.length - 1
+  ) {
+    if (window.outerWidth <= 767) {
+      favoritItems = favoritItems.splice(
+        favoritItems.indexOf(seachFavoriteList.lastChild.id),
+        2
+      );
+    } else if (window.outerWidth > 767) {
+      favoritItems = favoritItems.splice(
+        favoritItems.indexOf(seachFavoriteList.lastChild.id) - 2,
+        4
+      );
+    }
+  } else {
+    console.log('test1');
+  }
   await renderFavList(favoritItems);
   const FavElem = document.querySelectorAll('.seach-favorite-item');
 

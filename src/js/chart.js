@@ -1,41 +1,35 @@
 import Chart from 'chart.js/auto'; //link to chart.js
 let myChart = 0;
-const jsHiden = document.querySelector('.js-hiden');
-const chartBtnHide = document.querySelector('.chart--btn__show'); //excess with the text show Chart
-const hideChart = document.querySelector('.hidden_title'); //excess with text hide Chart
-const showChart = document.querySelector('.chart--btn'); //link to the show graph button
-const hidenBtn = document.querySelector('.hidden_btn'); //link to hide chart button
-const chartView = document.querySelector('.chart--view'); //link to the block with the chart itself
+const jsHidden = document.querySelector('.js-hiden');
+const chartBtnHide = document.querySelector('.chart--btn__show');
+const hideChart = document.querySelector('.hidden_title');
+const showChart = document.querySelector('.chart--btn');
+const hideBtn = document.querySelector('.hidden_btn');
+const viewChart = document.querySelector('.chart--view');
 const ctx = document.querySelector('.myChart').getContext('2d');
 chartBtnHide.addEventListener('click', onShowBox);
 showChart.addEventListener('click', onShowBox);
 hideChart.addEventListener('click', onHideBox);
-hidenBtn.addEventListener('click', onHideBox);
-//The function shows a graphic block with a link to the canvas
+hideBtn.addEventListener('click', onHideBox);
+
+//This function is called when the user clicks on a button to show the chart.
+//It adds the hidden class to the element with the class jsHidden and removes the hidden class from the element with the class viewChart, effectively displaying the chart.
 function onShowBox(e) {
-  jsHiden.classList.add('hidden') & chartView.classList.remove('hidden');
+  jsHidden.classList.add('hidden');
+  viewChart.classList.remove('hidden');
 }
-//The function removes the chart block
+//This function is called when the user clicks on a button to hide the chart.
+//It does the opposite of onShowBox(e), hiding the chart and displaying the hidden element.
 function onHideBox(e) {
-  chartView.classList.add('hidden') & jsHiden.classList.remove('hidden');
-}
-
-export default function runChart(data) {
-  onHideBox();
-  if (myChart) {
-    myChart.destroy();
-  }
-  const sliceDaily = data.slice(0, 5);
-  const dataToChart = processedData(sliceDaily);
-
-  chartRender(dataToChart, ctx);
+  viewChart.classList.add('hidden');
+  jsHidden.classList.remove('hidden');
 }
 
 // Takes an array of objects as input (obj).
 const processedData = obj => {
-  const getDateTxt = data => new Date(data.dt * 1000).toDateString();
+  const getDateTxt = data => new Date(data.dt * 1000).toDateString().slice(4);
   const proData = {
-    data: obj.map(elem => getDateTxt(elem).slice(4, getDateTxt(elem).length)),
+    data: obj.map(getDateTxt),
     temp: obj.map(elem => elem.temp.day),
     humidity: obj.map(elem => elem.humidity),
     speed: obj.map(elem => elem.wind_speed),
@@ -44,6 +38,14 @@ const processedData = obj => {
   return proData;
 };
 
+export default function runChart(data) {
+  onHideBox();
+  if (myChart) myChart.destroy();
+
+  const dataToChart = processedData(data.slice(0, 5));
+  chartRender(dataToChart, ctx);
+}
+
 // The function accepts an array of objects (ready data) and a link to the chart
 function chartRender(labels, link) {
   const configChart = {
@@ -51,50 +53,19 @@ function chartRender(labels, link) {
     data: {
       labels: labels.data,
       datasets: [
-        {
-          label: '— Temperature, C°' + resize(),
-          data: labels.temp,
-          tension: 0.2,
-          fill: false,
-          backgroundColor: 'rgba(255, 107, 9, 1)',
-          borderColor: 'rgba(255, 107, 9, 1)',
-          borderWidth: 1,
-        },
-        {
-          label: '— Humidity, %' + resize(),
-          data: labels.humidity,
-          tension: 0.2,
-          fill: false,
-          backgroundColor: 'rgba(9, 6, 235, 1)',
-          borderColor: 'rgba(9, 6, 235, 1)',
-          borderWidth: 1,
-        },
-        {
-          label: '— Wind Speed, m/s' + resize(),
-          data: labels.speed,
-          tension: 0.2,
-          fill: false,
-          backgroundColor: ['rgba(234, 154, 5, 1)'],
-          borderColor: ['rgba(234, 154, 5, 1)'],
-          borderWidth: 1,
-        },
-        {
-          label: '— Atmosphere Pressure, m/m',
-          data: labels.pressure,
-          tension: 0.2,
-          fill: false,
-          backgroundColor: 'rgba(6, 120, 6, 1)',
-          borderColor: 'rgba(6, 120, 6, 1)',
-          borderWidth: 1,
-        },
+        createDataset('Temperature, C°', labels.temp, 'rgba(255, 107, 9, 1)'),
+        createDataset('Humidity, %', labels.humidity, 'rgba(9, 6, 235, 1)'),
+        createDataset('Wind Speed, m/s', labels.speed, 'rgba(234, 154, 5, 1)'),
+        createDataset(
+          'Atmosphere Pressure, m/m',
+          labels.pressure,
+          'rgba(6, 120, 6, 1)'
+        ),
       ],
     },
     options: {
       layout: {
-        padding: {
-          left: 0,
-          bottom: 20,
-        },
+        padding: { left: 0, bottom: 20 },
       },
       plugins: {
         legend: {
@@ -107,48 +78,13 @@ function chartRender(labels, link) {
             color: 'rgba(247, 242, 242, 1)',
             padding: 10,
           },
-          // For Clickable
-          onClick: function (e, legendItem) {
-            const index = legendItem.datasetIndex;
-            const chart = this.chart;
-            const meta = chart.getDatasetMeta(index);
-
-            meta.hidden =
-              meta.hidden === null ? !chart.data.datasets[index].hidden : null;
-
-            chart.update();
-          },
+          onClick: toggleLegend,
         },
-        title: {
-          display: false,
-          text: 'Value of indicators',
-          position: 'left',
-          padding: 0,
-          fullSize: false,
-        },
+        title: { display: false },
       },
-
       scales: {
-        x: {
-          grid: {
-            color: 'rgba(255, 255, 255, 0.4)',
-            borderColor: 'rgba(255, 255, 255, 1)',
-          },
-          ticks: {
-            padding: 18,
-            color: 'rgba(255, 255, 255, 0.7)',
-          },
-        },
-        y: {
-          grid: {
-            color: 'rgba(255, 255, 255, 0.4)',
-            borderColor: 'rgba(255, 255, 255, 1)',
-          },
-          ticks: {
-            padding: 18,
-            color: 'rgba(255, 255, 255, 0.7)',
-          },
-        },
+        x: createScaleConfig(),
+        y: createScaleConfig(),
       },
       responsive: true,
       maintainAspectRatio: false,
@@ -157,6 +93,37 @@ function chartRender(labels, link) {
   };
 
   myChart = new Chart(link, configChart);
+}
+
+function createDataset(label, data, color) {
+  return {
+    label: '— ' + label + resize(),
+    data,
+    tension: 0.2,
+    fill: false,
+    backgroundColor: color,
+    borderColor: color,
+    borderWidth: 1,
+  };
+}
+
+function createScaleConfig() {
+  return {
+    grid: {
+      color: 'rgba(255, 255, 255, 0.4)',
+      borderColor: 'rgba(255, 255, 255, 1)',
+    },
+    ticks: { padding: 18, color: 'rgba(255, 255, 255, 0.7)' },
+  };
+}
+
+function toggleLegend(e, legendItem) {
+  const index = legendItem.datasetIndex;
+  const chart = this.chart;
+  const meta = chart.getDatasetMeta(index);
+  meta.hidden =
+    meta.hidden === null ? !chart.data.datasets[index].hidden : null;
+  chart.update();
 }
 
 function resize() {
@@ -168,12 +135,12 @@ function resize() {
 }
 
 export {
-  jsHiden,
+  jsHidden,
   chartBtnHide,
   hideChart,
   showChart,
-  hidenBtn,
-  chartView,
+  hideBtn,
+  viewChart,
   ctx,
   onShowBox,
   onHideBox,
